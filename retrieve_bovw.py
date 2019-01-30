@@ -12,19 +12,26 @@ def cos_similarity(v1, v2):
 	return cosine_similarity(v1.reshape(1, -1), v2.reshape(1, -1))
 
 def retrieve_similar_image(img, top_n=5):
+	# retrieve the vocabulary for the image in question
 	vocab = image_voc[img][0]
 	img_to_check = []
+
+	# For each vocabulary, retrieve the list of relevant images
+	# from inverted index. This will reduce the number of images to be
+	# processed and hence speeding it up. 
 	for ix, v in enumerate(vocab):
 		if int(v) > 0:
 			img_to_check.append(inverted_index[str(ix)])
 	img_to_check = np.unique(reduce(operator.add, img_to_check))
 	similarities = defaultdict()
-	for image in img_to_check:
 
+	# For each image that is relevant, compute the similarity score
+	for image in img_to_check:
 		similarities[image] = cos_similarity(
 			np.array(computed_tfidf[img]),
 			np.array(computed_tfidf[image]))[0][0]
 
+	# Return the top n similar images
 	return dict(sorted(similarities.items(),
 				key=lambda x:x[1],
 				reverse=True)[:top_n]).keys()

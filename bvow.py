@@ -20,6 +20,9 @@ from collections import defaultdict
 
 
 class KMeans:
+	"""
+	Class that performs the KMeans related tasks such as fitting and predicting
+	"""
 
 	def __init__(self, n_clusters):
 		self.n_clusters = n_clusters
@@ -65,11 +68,18 @@ class DescriptorGenerator:
 		return gray
 
 	def features(self, image):
+		"""
+		Retrieve the keypoints and descriptors for an image
+		"""
 		keypoints, descriptors = self.des_obj.detectAndCompute(image, None)
 		return [keypoints, descriptors]
 
 
 class BOVW:
+	"""
+	BOVW class performs the relevant tasks to generate the data required for
+	image retrieval.
+	"""
 	def __init__(self, data_path, method='sift', n_clusters=10,
 			nfeatures=1000):
 		self.t = int(time.time())
@@ -89,7 +99,7 @@ class BOVW:
 
 	def cluster(self):
 		"""    
-		cluster using KMeans algorithm, 
+		Cluster using KMeans algorithm implemented with opencv 
 		"""
 		self.kmeans.fit(self.descriptor_vstack)
 		with open("{}/kmeans_results.csv".format(self.t), "w") as f:
@@ -101,8 +111,8 @@ class BOVW:
   
 	def format_data(self, list_items):
 		"""    
-		restructures list into vstack array of shape
-		M samples x N features for sklearn
+		Convert list into vstack array of shape M samples x N features
+		for kMeans training
 		"""
 		v_stack = np.array(list_items[0])
 		print(len(list_items))
@@ -115,6 +125,9 @@ class BOVW:
 		return v_stack
 
 	def plot_hist(self):
+		"""
+		Plot the histogram for the distribution of the vocabularies i.e. clusters
+		"""
 		print("Plotting histogram")
 		counts = Counter(self.kmeans.label.flatten())
 
@@ -127,7 +140,6 @@ class BOVW:
 		plt.title("Complete Vocabulary Generated")
 		plt.xticks(np.array(x) + 0.4, x)
 		plt.savefig("visual_word_histogram.jpg")
-		# plt.show()
 
 	def load_images(self):
 		imlist = {}
@@ -145,12 +157,10 @@ class BOVW:
 
 	def train_vocabulary(self):
 		"""
-		This method contains the entire module 
-		required for training the bag of visual words model
-		Use of helper functions will be extensive.
+		This function loads the images, generates the descriptors
+		and performs the clustering
 		"""
 
-		# read file. prepare file lists.
 		if not self.images:
 			self.load_images()
 
@@ -251,6 +261,9 @@ class TFIDF:
 		return idf_dict
 
 	def compute_TFIDF(self, bow):
+		"""
+		TFIDF = TF * IDF
+		"""
 		tf_bow = self.compute_TF(bow)
 		tfidf = np.zeros(self.n_clusters)
 		for idx, tf in enumerate(tf_bow):
@@ -320,6 +333,13 @@ if __name__ == '__main__':
 	tfidf = TFIDF(bov.image_vocab, args['n_clusters'])
 
 	tfidf.generate_IDF_dict()
+	# Dump out the IDF dict so that it can be extended for unknown images if 
+	# required. - currently not implemented yet
+	with open("{}/idf_dict.txt".format(bov.t), "w") as f:
+		try:
+			json.dump([self.image_vocab], f)
+		except:
+			pass
 
 	print("Generating TFIDF for each image")
 	img_tfidf = defaultdict(list)
