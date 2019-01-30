@@ -12,3 +12,4 @@ dependencies:
     - flask
     - scikit-image
     - gunicorn
+    - redis
