@@ -1,0 +1,14 @@
+name: image_retrieval
+
+dependencies:
+  - python=3.6
+  - numpy
+  - scipy
+  - matplotlib
+  - nb_conda
+  - pip:
+    - opencv-python==3.4.2.16
+    - opencv-contrib-python==3.4.2.16
+    - flask
+    - scikit-image
+    - gunicorn
