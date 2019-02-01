@@ -337,7 +337,7 @@ if __name__ == '__main__':
 	# required. - currently not implemented yet
 	with open("{}/idf_dict.txt".format(bov.t), "w") as f:
 		try:
-			json.dump([self.image_vocab], f)
+			json.dump([bov.image_vocab], f)
 		except:
 			pass
 
