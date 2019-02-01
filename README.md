@@ -87,6 +87,107 @@ python retrieve_bovw.py --pretrained_path=<dir of trained data> --image=<id of t
 - image -- id of the image to be retrieved for, example "100000.jpg"
 - top_n -- (optional) default is 5. The id of the similar images.
 
+### Retrieval with Deep Learning data using trained VGG16 on ImageNet
+NOTE: the following method are referenced from the implementation of RMAC from https://github.com/noagarcia/keras_rmac  
+The relevant files are:
+```
+|- deep_learning_representation.ipynb
+|- deep_learning_representation.py
+|- deeplearning_1549050121.zip
+```
+`deep_learning_representation.ipynb` is a visual notebook that performs the task of retrieving the most similar
+images with trained VGG16 model on ImageNet with a Region-of-Interest pooling layer.
+
+The features are generated with:
+- VGG16 pretrained model on ImageNet layer
+- RoiPooling layer - returns an output of (1, sizeofROI, 512)
+```
+@article{DBLP:journals/corr/HeZR014,
+  author    = {Kaiming He and
+               Xiangyu Zhang and
+               Shaoqing Ren and
+               Jian Sun},
+  title     = {Spatial Pyramid Pooling in Deep Convolutional Networks for Visual
+               Recognition},
+  journal   = {CoRR},
+  volume    = {abs/1406.4729},
+  year      = {2014},
+  url       = {http://arxiv.org/abs/1406.4729},
+  archivePrefix = {arXiv},
+  eprint    = {1406.4729},
+  timestamp = {Mon, 13 Aug 2018 16:49:00 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/corr/HeZR014},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
+- Sum of the features of each ROI - returns an output of (1, 1, 512)
+
+
+`deep_learning_representation.py` is the python file that performs the generation of the relevant data for the task. It is equivalent to the first part of the notebook.
+To run training:
+```
+python deep_learning_representation.py --image_dir="images/"
+```
+- images_dir -- path to the directory image to be trained on
+The trained vectors are output to a directory prefixed with `deeplearning_{timestamp}`
+
+To retrieve image from the database:
+If there is trained vectors:
+```
+python deep_learning_representation.py --mode="retrieve" --query_image=<path> --trained_path=<dir_path>
+```
+- mode -- set mode to retrieve if it is to retrieve similar images, train(default)/retrieve
+- query-image -- path to the image to query
+- trained_path -- path to the directory of the trained data , unzip deeplearning_1549050121.zip to use and pass `deeplearning_1549050121` as the dir_path
+
+If there is no trained vector
+```
+python deep_learning_representation.py --mode="retrieve" --query_image=<path> --image_dir=<dir_path>
+```
+- mode -- set mode to retrieve if it is to retrieve similar images, train(default)/retrieve
+- query-image -- path to the image to query
+- image_dir -- path to the directory of images to be trained, output will be dumped to a directory with prefix deeplearning_*
+
+
+## Results
+These are the results from performing the image retrieval with the different methods and default values defined in the codes.
+The image retrieval is performed on Image 100002.jpg
+Feature Matching = ['100002.jpg', '100001.jpg', '100000.jpg', '100101.jpg', '100100.jpg']<br>
+<img src="results/100002.jpg"  width="300" height="300"><br>
+'100002.jpg'<br>
+<img src="results/100001.jpg"  width="300" height="300"><br>
+'100001.jpg'<br>
+<img src="results/100000.jpg"  width="300" height="300"><br>
+'100000.jpg'<br>
+<img src="results/100101.jpg"  width="300" height="300"><br>
+'100101.jpg'<br>
+<img src="results/100100.jpg"  width="300" height="300"><br>
+'100100.jpg'<br>
+
+BOW = ['100002.jpg', '107902.jpg', '100503.jpg', '107901.jpg', '100501.jpg']<br>
+<img src="results/100002.jpg"  width="300" height="300"><br>
+'100002.jpg'<br>
+<img src="results/107902.jpg"  width="300" height="300"><br>
+'107902.jpg'<br>
+<img src="results/100503.jpg"  width="300" height="300"><br>
+'100503.jpg'<br>
+<img src="results/107901.jpg"  width="300" height="300"><br>
+'107901.jpg'<br>
+<img src="results/100501.jpg"  width="300" height="300"><br>
+'100501.jpg'<br>
+                                                      
+                                                      
+DeepLearning = ['100002.jpg', '100501.jpg', '100503.jpg', '100401.jpg', '100000.jpg']<br>
+<img src="results/100002.jpg"  width="300" height="300"><br>
+'100002.jpg'<br>
+<img src="results/100501.jpg"  width="300" height="300"><br>
+'100501.jpg'<br>
+<img src="results/100503.jpg"  width="300" height="300"><br>
+'100503.jpg'<br>
+<img src="results/100401.jpg"  width="300" height="300"><br>
+'100401.jpg'<br>
+<img src="results/100000.jpg"  width="300" height="300"><br>
+'100000.jpg'<br>
 
 ## Requirements
 - The machine of which all these explorations are performed on is MacOS
