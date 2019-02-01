@@ -1,5 +1,7 @@
 # Project: Image Retrieval
 
+NOTE: unzip the image directories and the trained data directory before running
+
 ## Description
 The goal of this project is to build a system to retrieve near duplicate images.
 There is several parts to this project and the main library used is OpenCV in python.
